@@ -57,7 +57,7 @@ def dealcard(playerCards, dealerCards, deck, addtoHand):
 
 def printCards(playerCards, dealerCards, state):
     #WIN.fill((110, 153, 70))#Background green
-    
+    dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
     if state == 'show':
     # draw player cards
         x = 50
@@ -71,6 +71,11 @@ def printCards(playerCards, dealerCards, state):
         for card in dealerCards:
             WIN.blit(card.cardImage, (x, y))
             x += 10 + CARDWIDTH
+        playerprinttotal = GAMEFONT.render('Total:'+str(playertotal), 1, WHITE)
+        dealerprinttotal = GAMEFONT.render('Total:'+str(dealertotal), 1, WHITE)
+        WIN.blit(playerprinttotal, (50,235))
+        WIN.blit(dealerprinttotal, (50,460))
+         
 
     elif state == 'hide':
         x = 50
@@ -88,16 +93,41 @@ def printCards(playerCards, dealerCards, state):
         card_image = pygame.image.load(card_image_path)
         card_image = pygame.transform.scale(card_image, (CARDWIDTH, CARDHEIGHT))
         WIN.blit(card_image, (x, y))
+        playerprinttotal = GAMEFONT.render('Total: '+str(playertotal), 1, WHITE)
+        dealerprinttotal = GAMEFONT.render('Total: '+str(dealerCards[0].cardValue)+' + ??', 1, WHITE)
+        WIN.blit(playerprinttotal, (50,235))
+        WIN.blit(dealerprinttotal, (50,460))
     # draw dealer cards
     pygame.display.update()
 
 def printBalance():
-    playerbalance = GAMEFONT.render('Playerbalance is:', 1, WHITE)
-    dealerbalance = GAMEFONT.render('Dealerbalance is:', 1, WHITE)
-    WIN.blit(playerbalance, (50,20))
-    WIN.blit(dealerbalance, (50,245))
-
+    balance = GAMEFONT.render('Playerbalance is:      Dealerbalance is:', 1, WHITE)
+    WIN.blit(balance, (50,20))
     pygame.display.update()
+
+
+#Calculate value of all cards
+def calculateTotal(dealerCards, playerCards):
+    dealertotal = 0
+    dealeraces = 0
+    for card in dealerCards:
+        if card.cardValue == 11:
+            dealeraces += 1
+        dealertotal += card.cardValue
+    while dealeraces > 0 and dealertotal > 21:
+        dealertotal -= 10
+        dealeraces -= 1
+    
+    playertotal = 0
+    playeraces = 0
+    for card in playerCards:
+        if card.cardValue == 11:
+            playeraces += 1
+        playertotal += card.cardValue
+    while playeraces > 0 and playertotal > 21:
+        playertotal -= 10
+        playeraces -= 1
+    return dealertotal, playertotal
 
 def main():
     #initialize deck and players/dealer hands
