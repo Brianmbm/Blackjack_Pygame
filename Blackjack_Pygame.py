@@ -1,13 +1,14 @@
 ﻿import pygame
 import os
 import random
-
+pygame.font.init()
 WIDTH, HEIGHT = 1100, 700 #Size of main window
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))#Main window initialize
 pygame.display.set_caption("Blackjack")#Name on window
 FPS = 30
 CARDWIDTH, CARDHEIGHT = 125, 175
-
+GAMEFONT = pygame.font.SysFont('bahnschrift', 20)
+WHITE = 255,255,255
 class Card:
     def __init__(self, cardName, cardValue, cardImage):
         self.cardName = cardName
@@ -55,7 +56,7 @@ def dealcard(playerCards, dealerCards, deck, addtoHand):
     return addtoHand
 
 def printCards(playerCards, dealerCards, state):
-    WIN.fill((110, 153, 70))#Background green
+    #WIN.fill((110, 153, 70))#Background green
     
     if state == 'show':
     # draw player cards
@@ -88,12 +89,19 @@ def printCards(playerCards, dealerCards, state):
         card_image = pygame.transform.scale(card_image, (CARDWIDTH, CARDHEIGHT))
         WIN.blit(card_image, (x, y))
     # draw dealer cards
+    pygame.display.update()
 
-    
+def printBalance():
+    playerbalance = GAMEFONT.render('Playerbalance is:', 1, WHITE)
+    dealerbalance = GAMEFONT.render('Dealerbalance is:', 1, WHITE)
+    WIN.blit(playerbalance, (50,20))
+    WIN.blit(dealerbalance, (50,245))
+
     pygame.display.update()
 
 def main():
     #initialize deck and players/dealer hands
+    WIN.fill((110, 153, 70))#Background green
     deck = CardDeck() 
     playerCards = []
     dealerCards = []
@@ -106,6 +114,7 @@ def main():
 
     #prints out the the cards, hidding the dealer's second card
     printCards(playerCards, dealerCards, 'hide')
+    printBalance()
     clock = pygame.time.Clock()
     
     running = True
