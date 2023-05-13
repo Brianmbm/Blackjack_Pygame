@@ -1,5 +1,6 @@
 ﻿import pygame
 import os
+import random
 
 WIDTH, HEIGHT = 1100, 700 #Size of main window
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))#Main window initialize
@@ -45,15 +46,68 @@ class CardDeck:
             self.current_index += 1
             return card
 
-def draw_window(card):
+def dealcard(playerCards, dealerCards, deck, addtoHand):
+    while True:
+        index = random.randint(0, 51)
+        if deck.deck[index] not in playerCards and deck.deck[index] not in dealerCards:
+            addtoHand.append(deck.deck[index])
+            break
+    return addtoHand
+
+def printCards(playerCards, dealerCards, state):
     WIN.fill((110, 153, 70))#Background green
-    WIN.blit(card.cardImage,(50,50 ))
+    
+    if state == 'show':
+    # draw player cards
+        x = 50
+        y = 50
+        for card in playerCards:
+            WIN.blit(card.cardImage, (x, y))
+            x += 10 + CARDWIDTH
+
+        x = 50
+        y = 50 + CARDHEIGHT + 50
+        for card in dealerCards:
+            WIN.blit(card.cardImage, (x, y))
+            x += 10 + CARDWIDTH
+
+    elif state == 'hide':
+        x = 50
+        y = 50
+        for card in playerCards:
+            WIN.blit(card.cardImage, (x, y))
+            x += 10 + CARDWIDTH
+
+        x = 50
+        y = 50 + CARDHEIGHT + 50
+        
+        WIN.blit(dealerCards[0].cardImage, (x, y))
+        x += 10 + CARDWIDTH
+        card_image_path = os.path.join('Assets', 'backside.png')
+        card_image = pygame.image.load(card_image_path)
+        card_image = pygame.transform.scale(card_image, (CARDWIDTH, CARDHEIGHT))
+        WIN.blit(card_image, (x, y))
+    # draw dealer cards
+
+    
     pygame.display.update()
 
 def main():
-    deck = CardDeck() #initialize deck
-    card = pygame.Rect(50,50,CARDWIDTH, CARDHEIGHT)#First nr is x, second y(position), other is size of rectangel
+    #initialize deck and players/dealer hands
+    deck = CardDeck() 
+    playerCards = []
+    dealerCards = []
+
+    #deals two cards to each
+    playerCards = dealcard(playerCards, dealerCards, deck, playerCards) 
+    playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
+    dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
+    dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
+
+    #prints out the the cards, hidding the dealer's second card
+    printCards(playerCards, dealerCards, 'hide')
     clock = pygame.time.Clock()
+    
     running = True
     while running:
         clock.tick(FPS)#update window at 30 frames per second
@@ -65,14 +119,18 @@ def main():
             #keys_pressed = pygame.key.get_pressed()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:#hit
-                    draw_window(deck.__next__())
-                    card.x-=1
+                    playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
+                    printCards(playerCards, dealerCards, 'hide')
+                    
                 if event.key == pygame.K_s:#stand
-                    draw_window(deck.__next__())
-                    card.x-=1
+                    printCards(playerCards, dealerCards)
+                    
                 if event.key == pygame.K_d:#left
-                    card.x-=1
-                    draw_window(deck.__next__())
+                    
+                    printCards(playerCards, dealerCards)
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                    break
 
     pygame.quit()
 
