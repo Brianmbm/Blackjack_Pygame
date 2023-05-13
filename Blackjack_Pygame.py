@@ -17,17 +17,17 @@ class CardDeck:
     def __init__(self):
         self.deck = []
         types = ['spades', 'clubs', 'diamonds', 'hearts']
-        values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+        values = ['a', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k']
         for suit in types:
             for value in values:
-                if value in ['J', 'Q', 'K']:
+                if value in ['j', 'q', 'k']:
                     card_value = 10
-                elif value == 'A':
+                elif value == 'a':
                     card_value = 11
                 else:
                     card_value = int(value)
                 card_name = value + suit
-                card_image_path = os.path.join('Assets', f'{value.lower()}_of_{suit.lower()}.png')
+                card_image_path = os.path.join('Assets', f'{value}_of_{suit}.png')
                 card_image = pygame.image.load(card_image_path)
                 card_image = pygame.transform.scale(card_image, (CARDWIDTH, CARDHEIGHT))
                 self.deck.append(Card(card_name, card_value, card_image))
@@ -62,14 +62,17 @@ def main():
             # Check for QUIT event. If QUIT, then set running to false.
             if event.type == pygame.QUIT:
                 running = False
-        keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_w]:#hit
-            card.x-=1
-        if keys_pressed[pygame.K_s]:#stand
-            card.x-=1
-        if keys_pressed[pygame.K_d]:#left
-            card.x-=1
-            draw_window(deck.__next__())
+            #keys_pressed = pygame.key.get_pressed()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:#hit
+                    draw_window(deck.__next__())
+                    card.x-=1
+                if event.key == pygame.K_s:#stand
+                    draw_window(deck.__next__())
+                    card.x-=1
+                if event.key == pygame.K_d:#left
+                    card.x-=1
+                    draw_window(deck.__next__())
 
     pygame.quit()
 
