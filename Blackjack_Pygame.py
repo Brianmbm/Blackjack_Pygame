@@ -54,8 +54,16 @@ def dealcard(playerCards, dealerCards, deck, addtoHand):
             addtoHand.append(deck.deck[index])
             break
     return addtoHand
+def drawStartMenu():
+    WIN.fill((110, 153, 70))
+    title = GAMEFONT.render('Blackjack', 1, (255, 255, 255))
+    start_button = GAMEFONT.render('Start', True, (255, 255, 255))
+    start_button = GAMEFONT.render('Start', True, (255, 255, 255))
+    WIN.blit(title, (WIDTH/2 - title.get_width()/2, HEIGHT/2 - title.get_height()/2))
+    WIN.blit(start_button, (WIDTH/2 - start_button.get_width()/2, HEIGHT/2 + start_button.get_height()/2))
+    pygame.display.update()
 
-def printCards(playerCards, dealerCards, state):
+def drawCardsgetTotal(playerCards, dealerCards, state):
     WIN.fill((110, 153, 70))#Background green
     dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
     if state == 'show':
@@ -172,7 +180,7 @@ def checkWinner(playertotal, dealertotal):
 def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal):
     while dealertotal < 17:
         dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
-        playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
+        playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show')
         pygame.time.delay(1000)
     
     
@@ -183,20 +191,16 @@ def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal):
 ##TODO: make dealer turn function
 #TODO: make balance and betting functions
 def main():
+    GAMESTATE = "start_menu"
     #initialize deck and players/dealer hands
-    WIN.fill((110, 153, 70))#Background green
     deck = CardDeck() 
     playerCards = []
     dealerCards = []
-
     #deals two cards to each
     playerCards = dealcard(playerCards, dealerCards, deck, playerCards) 
     playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
     dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
     dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
-
-    #prints out the the cards, hidding the dealer's second card
-    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
     clock = pygame.time.Clock()
     
     running = True
@@ -206,45 +210,58 @@ def main():
         for event in pygame.event.get():
             # Check for QUIT event. If QUIT, then set running to false.
             if event.type == pygame.QUIT:
-                running = False
                 pygame.quit()
 
-            if playertotal == 21 or dealertotal == 21:
-                playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
-                checkWinner(playertotal, dealertotal)
-                running = False
-                break
+            if GAMESTATE == "start_menu":
+                drawStartMenu()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_s:
+                        GAMESTATE = "game"
+                        #game_over = False
 
-            #keys_pressed = pygame.key.get_pressed()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:#hit
-                    playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
-                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
-                    if playertotal > 21:
-                        playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
+            elif GAMESTATE == "game":
+
+                    WIN.fill((110, 153, 70))#Background green
+                    #prints out the the cards, hidding the dealer's second card
+                    playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'hide')
+
+                    if playertotal == 21 or dealertotal == 21:
+                        playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show')
                         checkWinner(playertotal, dealertotal)
                         running = False
                         break
-                    elif playertotal == 21:
-                        dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal)
-                        running = False
-                        break
-                    else:
-                        continue
-                    
-                if event.key == pygame.K_s:#stand
-                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
-                    dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal)
-                    running = False
-                    break
-                    
-                if event.key == pygame.K_d:#left
-                    
-                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                    break
 
+                    #keys_pressed = pygame.key.get_pressed()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_w:#hit
+                            playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
+                            playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'hide')
+                            if playertotal > 21:
+                                playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show')
+                                checkWinner(playertotal, dealertotal)
+                                running = False
+                                break
+                            elif playertotal == 21:
+                                dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal)
+                                running = False
+                                break
+                            else:
+                                continue
+                    
+                        if event.key == pygame.K_s:#stand
+                            playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show')
+                            dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal)
+                            running = False
+                            break
+                    
+                        if event.key == pygame.K_d:#left
+                    
+                            playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'hide')
+                        if event.key == pygame.K_ESCAPE:
+                            running = False
+                            break
+
+    #GAMESTATE = "start_menu"
     main()
 
 if __name__ == "__main__":
