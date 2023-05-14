@@ -169,6 +169,16 @@ def checkWinner(playertotal, dealertotal):
     pygame.time.delay(2000)
     return playerbalance, dealerbalance 
 
+def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal):
+    while dealertotal < 17:
+        dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
+        playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
+        pygame.time.delay(1000)
+    
+    
+    dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
+    playerbalance, dealerbalance = checkWinner(playertotal, dealertotal)
+    return playerbalance, dealerbalance
 #TODO: Make main menu
 ##TODO: make dealer turn function
 #TODO: make balance and betting functions
@@ -199,11 +209,9 @@ def main():
                 running = False
                 pygame.quit()
 
-            #TODO: How to test if this works
             if playertotal == 21 or dealertotal == 21:
                 playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
                 checkWinner(playertotal, dealertotal)
-                
                 running = False
                 break
 
@@ -218,13 +226,17 @@ def main():
                         running = False
                         break
                     elif playertotal == 21:
-                        #Put dealerturn here
+                        dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal)
+                        running = False
                         break
                     else:
                         continue
                     
                 if event.key == pygame.K_s:#stand
-                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
+                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
+                    dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal)
+                    running = False
+                    break
                     
                 if event.key == pygame.K_d:#left
                     
