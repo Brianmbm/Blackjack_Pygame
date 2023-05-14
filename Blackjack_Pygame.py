@@ -56,7 +56,7 @@ def dealcard(playerCards, dealerCards, deck, addtoHand):
     return addtoHand
 
 def printCards(playerCards, dealerCards, state):
-    #WIN.fill((110, 153, 70))#Background green
+    WIN.fill((110, 153, 70))#Background green
     dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
     if state == 'show':
     # draw player cards
@@ -71,10 +71,13 @@ def printCards(playerCards, dealerCards, state):
         for card in dealerCards:
             WIN.blit(card.cardImage, (x, y))
             x += 10 + CARDWIDTH
-        playerprinttotal = GAMEFONT.render('Total:'+str(playertotal), 1, WHITE)
-        dealerprinttotal = GAMEFONT.render('Total:'+str(dealertotal), 1, WHITE)
+        playerprinttotal = GAMEFONT.render('Total: '+str(playertotal), 1, WHITE)
+        dealerprinttotal = GAMEFONT.render('Total: '+str(dealertotal), 1, WHITE)
         WIN.blit(playerprinttotal, (50,235))
         WIN.blit(dealerprinttotal, (50,460))
+        pygame.display.update()
+        return playertotal, dealertotal
+    
          
 
     elif state == 'hide':
@@ -97,13 +100,13 @@ def printCards(playerCards, dealerCards, state):
         dealerprinttotal = GAMEFONT.render('Total: '+str(dealerCards[0].cardValue)+' + ??', 1, WHITE)
         WIN.blit(playerprinttotal, (50,235))
         WIN.blit(dealerprinttotal, (50,460))
+        balance = GAMEFONT.render('Playerbalance is:      Dealerbalance is:', 1, WHITE)
+        WIN.blit(balance, (50,20))
+        pygame.display.update()
+        return playertotal, dealertotal
     # draw dealer cards
-    pygame.display.update()
+    
 
-def printBalance():
-    balance = GAMEFONT.render('Playerbalance is:      Dealerbalance is:', 1, WHITE)
-    WIN.blit(balance, (50,20))
-    pygame.display.update()
 
 
 #Calculate value of all cards
@@ -129,6 +132,46 @@ def calculateTotal(dealerCards, playerCards):
         playeraces -= 1
     return dealertotal, playertotal
 
+def checkWinner(playertotal, dealertotal):
+    #TODO: fix bet and balances later
+    bet = 0
+    playerbalance = 0
+    dealerbalance = 0
+    PRINTTEXT = ''
+    if playertotal > 21: 
+        PRINTTEXT = 'Bust! Dealer wins.'
+        playerbalance -= bet
+        dealerbalance += bet
+    elif playertotal == 21 and dealertotal != 21:
+        PRINTTEXT = "Blackjack! You win"
+        #0.5 added so it doesnt round down when betting odd and converting to int
+        winnings = bet * 3/2+0.5
+        winnings = int(winnings)
+        playerbalance += winnings
+        dealerbalance -= winnings
+    elif dealertotal > 21:
+        PRINTTEXT = "You win!"
+        playerbalance += bet
+        dealerbalance -= bet
+    elif playertotal == dealertotal:
+        PRINTTEXT = "Push, nobody wins"
+    elif playertotal > dealertotal:
+        PRINTTEXT = "You win!"
+        playerbalance += bet
+        dealerbalance -= bet
+    elif playertotal < dealertotal:
+        PRINTTEXT = "You lose!"
+        playerbalance -= bet
+        dealerbalance += bet
+    PRINTTEXT = GAMEFONT.render(PRINTTEXT, 1, WHITE)
+    WIN.blit(PRINTTEXT, (50, 500))
+    pygame.display.update()
+    pygame.time.delay(2000)
+    return playerbalance, dealerbalance 
+
+#TODO: Make main menu
+##TODO: make dealer turn function
+#TODO: make balance and betting functions
 def main():
     #initialize deck and players/dealer hands
     WIN.fill((110, 153, 70))#Background green
@@ -143,8 +186,7 @@ def main():
     dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
 
     #prints out the the cards, hidding the dealer's second card
-    printCards(playerCards, dealerCards, 'hide')
-    printBalance()
+    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
     clock = pygame.time.Clock()
     
     running = True
@@ -155,23 +197,43 @@ def main():
             # Check for QUIT event. If QUIT, then set running to false.
             if event.type == pygame.QUIT:
                 running = False
+                pygame.quit()
+
+            #TODO: How to test if this works
+            if playertotal == 21 or dealertotal == 21:
+                playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
+                checkWinner(playertotal, dealertotal)
+                
+                running = False
+                break
+
             #keys_pressed = pygame.key.get_pressed()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:#hit
                     playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
-                    printCards(playerCards, dealerCards, 'hide')
+                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
+                    if playertotal > 21:
+                        playertotal, dealertotal = printCards(playerCards, dealerCards, 'show')
+                        checkWinner(playertotal, dealertotal)
+                        running = False
+                        break
+                    elif playertotal == 21:
+                        #Put dealerturn here
+                        break
+                    else:
+                        continue
                     
                 if event.key == pygame.K_s:#stand
-                    printCards(playerCards, dealerCards)
+                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
                     
                 if event.key == pygame.K_d:#left
                     
-                    printCards(playerCards, dealerCards)
+                    playertotal, dealertotal = printCards(playerCards, dealerCards, 'hide')
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     break
 
-    pygame.quit()
+    main()
 
 if __name__ == "__main__":
     main()
