@@ -5,10 +5,14 @@ pygame.font.init()
 WIDTH, HEIGHT = 1100, 700 #Size of main window
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))#Main window initialize
 pygame.display.set_caption("Blackjack")#Name on window
+windowiconpath = os.path.join('Assets', 'ag3aw-nd7nh-001.ico')
+windowicon = pygame.image.load(windowiconpath)
+pygame.display.set_icon(windowicon)#Icon image next to window name
 FPS = 30
 CARDWIDTH, CARDHEIGHT = 125, 175
 GAMEFONT = pygame.font.SysFont('bahnschrift', 20)
 WHITE = 255,255,255
+BLACK = 0,0,0
 class Card:
     def __init__(self, cardName, cardValue, cardImage):
         self.cardName = cardName
@@ -56,11 +60,19 @@ def dealcard(playerCards, dealerCards, deck, addtoHand):
     return addtoHand
 def drawStartMenu():
     WIN.fill((110, 153, 70))
-    title = GAMEFONT.render('Blackjack', 1, (255, 255, 255))
-    start_button = GAMEFONT.render('Start', True, (255, 255, 255))
-    start_button = GAMEFONT.render('Start', True, (255, 255, 255))
-    WIN.blit(title, (WIDTH/2 - title.get_width()/2, HEIGHT/2 - title.get_height()/2))
+    #lucidafax rockwellextra bookmanoldstyle
+    TITLEFONT = pygame.font.SysFont('rockwellextra', 100)
+    MENUFONT = pygame.font.SysFont('rockwellextra', 40)
+    title = TITLEFONT.render('Blackjack', 1, BLACK)
+    start_button = MENUFONT.render('Space - Start', 1, BLACK)
+    WIN.blit(title, (200, 100))
     WIN.blit(start_button, (WIDTH/2 - start_button.get_width()/2, HEIGHT/2 + start_button.get_height()/2))
+
+    blackjackimagepath = os.path.join('Assets', 'Blackjack-icon.png')
+    blackjackimage = pygame.image.load(blackjackimagepath)
+    blackjackimage = pygame.transform.scale(blackjackimage, (200, 200))
+    WIN.blit(blackjackimage, (800, 50))
+
     pygame.display.update()
 
 def drawCardsgetTotal(playerCards, dealerCards, state):
@@ -215,7 +227,7 @@ def main():
             if GAMESTATE == "start_menu":
                 drawStartMenu()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_s:
+                    if event.key == pygame.K_SPACE:
                         GAMESTATE = "game"
                         #game_over = False
 
