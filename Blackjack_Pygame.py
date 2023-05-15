@@ -10,7 +10,7 @@ windowicon = pygame.image.load(windowiconpath)
 pygame.display.set_icon(windowicon)#Icon image next to window name
 FPS = 30
 CARDWIDTH, CARDHEIGHT = 125, 175
-GAMEFONT = pygame.font.SysFont('bahnschrift', 20)
+GAMEFONT = pygame.font.SysFont('rockwellextra', 20)
 WHITE = 255,255,255
 BLACK = 0,0,0
 class Card:
@@ -65,8 +65,15 @@ def drawStartMenu():
     MENUFONT = pygame.font.SysFont('rockwellextra', 40)
     title = TITLEFONT.render('Blackjack', 1, BLACK)
     start_button = MENUFONT.render('Space - Start', 1, BLACK)
+    save_button = MENUFONT.render('S - Save', 1, BLACK)
+    quit_button = MENUFONT.render('ESC - Quit', 1, BLACK)
+    rules_button = MENUFONT.render('R - Rules', 1, BLACK)
     WIN.blit(title, (200, 100))
-    WIN.blit(start_button, (WIDTH/2 - start_button.get_width()/2, HEIGHT/2 + start_button.get_height()/2))
+    WIN.blit(start_button, (WIDTH/2 - start_button.get_width()/2, 300))
+    WIN.blit(save_button, (WIDTH/2 - start_button.get_width()/2, 350))
+    WIN.blit(rules_button, (WIDTH/2 - start_button.get_width()/2, 400))
+    WIN.blit(quit_button, (WIDTH/2 - start_button.get_width()/2, 450))
+
 
     blackjackimagepath = os.path.join('Assets', 'Blackjack-icon.png')
     blackjackimage = pygame.image.load(blackjackimagepath)
@@ -85,20 +92,19 @@ def drawCardsgetTotal(playerCards, dealerCards, state):
         for card in playerCards:
             WIN.blit(card.cardImage, (x, y))
             x += 10 + CARDWIDTH
-
         x = 50
         y = 50 + CARDHEIGHT + 50
         for card in dealerCards:
             WIN.blit(card.cardImage, (x, y))
             x += 10 + CARDWIDTH
-        playerprinttotal = GAMEFONT.render('Total: '+str(playertotal), 1, WHITE)
-        dealerprinttotal = GAMEFONT.render('Total: '+str(dealertotal), 1, WHITE)
+        playerprinttotal = GAMEFONT.render('Total: '+str(playertotal), 1, BLACK)
+        dealerprinttotal = GAMEFONT.render('Total: '+str(dealertotal), 1, BLACK)
         WIN.blit(playerprinttotal, (50,235))
         WIN.blit(dealerprinttotal, (50,460))
+        balance = GAMEFONT.render('Playerbalance is:      Dealerbalance is:', 1, BLACK)
+        WIN.blit(balance, (50,20))
         pygame.display.update()
         return playertotal, dealertotal
-    
-         
 
     elif state == 'hide':
         x = 50
@@ -106,26 +112,22 @@ def drawCardsgetTotal(playerCards, dealerCards, state):
         for card in playerCards:
             WIN.blit(card.cardImage, (x, y))
             x += 10 + CARDWIDTH
-
         x = 50
         y = 50 + CARDHEIGHT + 50
-        
         WIN.blit(dealerCards[0].cardImage, (x, y))
         x += 10 + CARDWIDTH
         card_image_path = os.path.join('Assets', 'backside.png')
         card_image = pygame.image.load(card_image_path)
         card_image = pygame.transform.scale(card_image, (CARDWIDTH, CARDHEIGHT))
         WIN.blit(card_image, (x, y))
-        playerprinttotal = GAMEFONT.render('Total: '+str(playertotal), 1, WHITE)
-        dealerprinttotal = GAMEFONT.render('Total: '+str(dealerCards[0].cardValue)+' + ??', 1, WHITE)
+        playerprinttotal = GAMEFONT.render('Total: '+str(playertotal), 1, BLACK)
+        dealerprinttotal = GAMEFONT.render('Total: '+str(dealerCards[0].cardValue)+' + ??', 1, BLACK)
         WIN.blit(playerprinttotal, (50,235))
         WIN.blit(dealerprinttotal, (50,460))
-        balance = GAMEFONT.render('Playerbalance is:      Dealerbalance is:', 1, WHITE)
+        balance = GAMEFONT.render('Playerbalance is:      Dealerbalance is:', 1, BLACK)
         WIN.blit(balance, (50,20))
         pygame.display.update()
         return playertotal, dealertotal
-    # draw dealer cards
-    
 
 
 
@@ -183,7 +185,7 @@ def checkWinner(playertotal, dealertotal):
         PRINTTEXT = "You lose!"
         playerbalance -= bet
         dealerbalance += bet
-    PRINTTEXT = GAMEFONT.render(PRINTTEXT, 1, WHITE)
+    PRINTTEXT = GAMEFONT.render(PRINTTEXT, 1, BLACK)
     WIN.blit(PRINTTEXT, (50, 500))
     pygame.display.update()
     pygame.time.delay(2000)
@@ -202,6 +204,8 @@ def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal):
 #TODO: Make main menu
 ##TODO: make dealer turn function
 #TODO: make balance and betting functions
+#TODO: Implement rules and save from main menu
+#TODO: Make game over/win function
 def main():
     GAMESTATE = "start_menu"
     #initialize deck and players/dealer hands
@@ -213,6 +217,8 @@ def main():
     playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
     dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
     dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
+    playerbalance = 50
+    dealerbalance = 100
     clock = pygame.time.Clock()
     
     running = True
@@ -229,6 +235,13 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         GAMESTATE = "game"
+                        #game_over = False
+                    if event.key == pygame.K_s:#NYI
+                        ()
+                    if event.key == pygame.K_r:#NYI
+                        ()
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
                         #game_over = False
 
             elif GAMESTATE == "game":
