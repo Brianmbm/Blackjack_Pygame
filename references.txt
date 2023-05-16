@@ -1,0 +1,19 @@
+Main program skeleton for pygames - Tech with Time: Pygame in 90 Minutes: 
+https://www.youtube.com/watch?v=jO6qQDNa2UY&ab_channel=TechWithTim
+
+Getting text input in pygame:
+https://coderslegacy.com/python/text-input-in-pygame/
+https://www.youtube.com/watch?v=U0a83bRJw6o&ab_channel=ProgrammingKnowledge
+https://www.youtube.com/watch?v=Rvcyf4HsWiw&ab_channel=ClearCode
+
+Getting pygame fonts:
+https://coderslegacy.com/python/pygame-font/
+
+Loading and printing image:
+https://www.pygame.org/docs/ref/image.html
+
+Creating a menu in pygame:
+https://www.makeuseof.com/start-menu-and-game-over-screen-with-pygame/
+
+Changing window icon:
+https://stackoverflow.com/questions/21271059/how-do-i-change-the-pygame-icon

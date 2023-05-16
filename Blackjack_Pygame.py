@@ -13,6 +13,8 @@ CARDWIDTH, CARDHEIGHT = 125, 175
 GAMEFONT = pygame.font.SysFont('rockwellextra', 20)
 WHITE = 255,255,255
 BLACK = 0,0,0
+
+
 class Card:
     def __init__(self, cardName, cardValue, cardImage):
         self.cardName = cardName
@@ -65,7 +67,7 @@ def drawStartMenu():
     MENUFONT = pygame.font.SysFont('rockwellextra', 40)
     title = TITLEFONT.render('Blackjack', 1, BLACK)
     start_button = MENUFONT.render('Space - Start', 1, BLACK)
-    save_button = MENUFONT.render('S - Save', 1, BLACK)
+    save_button = MENUFONT.render('E - Load', 1, BLACK)
     quit_button = MENUFONT.render('ESC - Quit', 1, BLACK)
     rules_button = MENUFONT.render('R - Rules', 1, BLACK)
     WIN.blit(title, (200, 100))
@@ -201,6 +203,8 @@ def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal):
     dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
     playerbalance, dealerbalance = checkWinner(playertotal, dealertotal)
     return playerbalance, dealerbalance
+
+
 #TODO: Make main menu
 ##TODO: make dealer turn function
 #TODO: make balance and betting functions
@@ -234,15 +238,39 @@ def main():
                 drawStartMenu()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        GAMESTATE = "game"
-                        #game_over = False
-                    if event.key == pygame.K_s:#NYI
+                        GAMESTATE = "balance"
+                        
+                    if event.key == pygame.K_e:#NYI(LOAD)
                         ()
-                    if event.key == pygame.K_r:#NYI
+                    if event.key == pygame.K_r:#NYI(RULES)
                         ()
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        #game_over = False
+
+            elif GAMESTATE == "balance": 
+                   user_text = ''
+                   text = GAMEFONT.render(user_text, 1, BLACK)
+                   stopinput = True
+                   while stopinput == True:
+                       WIN.fill((110, 153, 70))
+                       for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_BACKSPACE:
+                                    user_text = user_text[:-1]
+                                    text = GAMEFONT.render(user_text, 1, BLACK)
+                                if event.key == pygame.K_RETURN:
+                                    GAMESTATE = "game"
+                                    stopinput = False   
+                            if event.type == pygame.TEXTINPUT:
+                                user_text += event.text
+                                text = GAMEFONT.render(user_text, 1, BLACK)
+                       WIN.blit(text, (100, 150))
+                       pygame.display.update()
+                   
+
+                        
 
             elif GAMESTATE == "game":
 
