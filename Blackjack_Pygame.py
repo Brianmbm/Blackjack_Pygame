@@ -13,6 +13,7 @@ CARDWIDTH, CARDHEIGHT = 125, 175
 GAMEFONT = pygame.font.SysFont('rockwellextra', 20)
 WHITE = 255,255,255
 BLACK = 0,0,0
+BACKGROUNDGREEN = 110, 153, 70
 
 
 class Card:
@@ -61,18 +62,18 @@ def dealcard(playerCards, dealerCards, deck, addtoHand):
             break
     return addtoHand
 def drawStartMenu():
-    WIN.fill((110, 153, 70))
+    WIN.fill(BACKGROUNDGREEN)
     #lucidafax rockwellextra bookmanoldstyle
     TITLEFONT = pygame.font.SysFont('rockwellextra', 100)
     MENUFONT = pygame.font.SysFont('rockwellextra', 40)
     title = TITLEFONT.render('Blackjack', 1, BLACK)
     start_button = MENUFONT.render('Space - Start', 1, BLACK)
-    save_button = MENUFONT.render('E - Load', 1, BLACK)
+    load_button = MENUFONT.render('E - Load', 1, BLACK)
     quit_button = MENUFONT.render('ESC - Quit', 1, BLACK)
     rules_button = MENUFONT.render('R - Rules', 1, BLACK)
     WIN.blit(title, (200, 100))
     WIN.blit(start_button, (WIDTH/2 - start_button.get_width()/2, 300))
-    WIN.blit(save_button, (WIDTH/2 - start_button.get_width()/2, 350))
+    WIN.blit(load_button, (WIDTH/2 - start_button.get_width()/2, 350))
     WIN.blit(rules_button, (WIDTH/2 - start_button.get_width()/2, 400))
     WIN.blit(quit_button, (WIDTH/2 - start_button.get_width()/2, 450))
     blackjackimagepath = os.path.join('Assets', 'Blackjack-icon.png')
@@ -81,12 +82,11 @@ def drawStartMenu():
     WIN.blit(blackjackimage, (800, 50))
 
     pygame.display.update()
-
+#Function draws in-game cards/menu and calls calculatetotal function inside, returns card totals
 def drawCardsgetTotal(playerCards, dealerCards, state, playerbalance, dealerbalance, bet):
-    WIN.fill((110, 153, 70))#Background green
+    WIN.fill(BACKGROUNDGREEN)
     dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
     if state == 'show':
-    # draw player cards
         x = 50
         y = 50
         for card in playerCards:
@@ -131,7 +131,7 @@ def drawCardsgetTotal(playerCards, dealerCards, state, playerbalance, dealerbala
 
 
 
-#Calculate value of all cards
+#Calculate value of all cards, called inside Drawcardsgettotal function
 def calculateTotal(dealerCards, playerCards):
     dealertotal = 0
     dealeraces = 0
@@ -154,6 +154,7 @@ def calculateTotal(dealerCards, playerCards):
         playeraces -= 1
     return dealertotal, playertotal
 
+#Checks winner of round changes balances accordingly
 def checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet):
     #TODO: fix bet and balances later
     PRINTTEXT = ''
@@ -188,6 +189,7 @@ def checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet):
     pygame.time.delay(2000)
     return playerbalance, dealerbalance, bet 
 
+#Function called when player has finished his turn or hand is busted
 def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerbalance, dealerbalance, bet):
     while dealertotal < 17:
         dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
@@ -204,6 +206,9 @@ def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerb
 #TODO: Implement save from balance menu
 #TODO: Make game over/win function (in lines below gamestate = balance)
 #TODO: Implement double function while in-game
+#TODO: Refactor balance menu
+#TODO: Refactor variable names and functions
+#TODO: Low priority- add mouse function to click buttons instead of keys in menus (probably use of rect class and collisions)
 
 def main():
     GAMESTATE = "start_menu"
@@ -259,7 +264,7 @@ def main():
                        promptquestion = GAMEFONT.render ('How much do you want to bet? Write 0 to save and exit.', 1, BLACK)
                        getbet = True
                        while getbet == True:
-                           WIN.fill((110, 153, 70))
+                           WIN.fill(BACKGROUNDGREEN)
                            for event in pygame.event.get():
                                 if event.type == pygame.QUIT:
                                     pygame.quit()
@@ -327,7 +332,7 @@ def main():
                    
             elif GAMESTATE == "game":
 
-                    WIN.fill((110, 153, 70))#Background green
+                    WIN.fill(BACKGROUNDGREEN)
                     #prints out the the cards, hidding the dealer's second card
                     playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'hide',  playerbalance, dealerbalance, bet)
 
