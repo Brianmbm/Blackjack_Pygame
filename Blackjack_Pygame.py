@@ -1,6 +1,7 @@
 ﻿import pygame
 import os
 import random
+import rules
 pygame.font.init()
 WIDTH, HEIGHT = 1100, 700 #Size of main window
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))#Main window initialize
@@ -14,6 +15,7 @@ GAMEFONT = pygame.font.SysFont('rockwellextra', 20)
 WHITE = 255,255,255
 BLACK = 0,0,0
 BACKGROUNDGREEN = 110, 153, 70
+RED = 171,32,32
 
 
 class Card:
@@ -244,7 +246,10 @@ def main():
                     if event.key == pygame.K_e:#NYI(LOAD)
                         ()
                     if event.key == pygame.K_r:#NYI(RULES)
-                        ()
+                        GAMESTATE = rules.rules_render()
+                        running = False
+                        break
+
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
 
