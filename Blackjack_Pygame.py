@@ -247,25 +247,73 @@ def main():
 
             elif GAMESTATE == "balance": 
                    user_text = ''
+                   warning_text = ''
                    inputbet = GAMEFONT.render(user_text, 1, BLACK)
-                   stopinput = True
-                   while stopinput == True:
+                   balance = GAMEFONT.render('Playerbalance: '+str(playerbalance)+'      Dealerbalance: '+str(dealerbalance), 1, BLACK)
+                   getbet = True
+                   while getbet == True:
                        WIN.fill((110, 153, 70))
                        for event in pygame.event.get():
                             if event.type == pygame.QUIT:
                                 pygame.quit()
                             if event.type == pygame.KEYDOWN:
-                                if event.key == pygame.K_BACKSPACE:
-                                    user_text = user_text[:-1]
-                                    inputbet = GAMEFONT.render(user_text, 1, BLACK)
-                                if event.key == pygame.K_RETURN:
-                                    bet = int(user_text)
-                                    GAMESTATE = "game"
-                                    stopinput = False   
+                                try:
+                                    if event.key == pygame.K_BACKSPACE:
+                                        user_text = user_text[:-1]
+                                        inputbet = GAMEFONT.render(user_text, 1, BLACK)
+                                    if event.key == pygame.K_RETURN:
+                                        bet = int(user_text)
+                                        if bet < 0:
+                                            warning_text = "Minimum bet is 1$."
+                                            warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                            WIN.blit(warning_text, (50, 50))
+                                            WIN.blit(balance, (50,20))
+                                            pygame.display.update()
+                                            pygame.time.delay(2000)
+                                            user_text = ''
+                                        
+                                        
+                                        
+                                        elif bet > playerbalance:
+                                            warning_text = "Cannot bet more than available funds."
+                                            warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                            WIN.blit(warning_text, (50, 50))
+                                            WIN.blit(balance, (50,20))
+                                            pygame.display.update()
+                                            pygame.time.delay(2000)
+                                            user_text = ''
+                                        
+                                        
+                                        elif bet > dealerbalance:
+                                            warning_text = "Cannot bet more than dealer's available funds."
+                                            warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                            WIN.blit(warning_text, (50, 50))
+                                            WIN.blit(balance, (50,20))
+                                            pygame.display.update()
+                                            pygame.time.delay(2000)
+                                            user_text = ''
+                                        elif bet == 0:#NYI Save
+                                            pass
+
+                                        else:
+                                            GAMESTATE = "game"
+                                            getbet = False 
+                                except ValueError:
+                                    warning_text = "Invalid input! Please enter a valid number."
+                                    warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                    WIN.blit(warning_text, (50, 50))
+                                    WIN.blit(balance, (50,20))
+                                    pygame.display.update()
+                                    pygame.time.delay(2000)
+                                    user_text = ''
+
+  
                             if event.type == pygame.TEXTINPUT:
                                 user_text += event.text
                                 inputbet = GAMEFONT.render(user_text, 1, BLACK)
+                       inputbet = GAMEFONT.render(user_text, 1, BLACK)
                        WIN.blit(inputbet, (100, 150))
+                       WIN.blit(balance, (50,20))
                        pygame.display.update()
                    
 
