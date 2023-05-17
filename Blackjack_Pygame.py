@@ -75,8 +75,6 @@ def drawStartMenu():
     WIN.blit(save_button, (WIDTH/2 - start_button.get_width()/2, 350))
     WIN.blit(rules_button, (WIDTH/2 - start_button.get_width()/2, 400))
     WIN.blit(quit_button, (WIDTH/2 - start_button.get_width()/2, 450))
-
-
     blackjackimagepath = os.path.join('Assets', 'Blackjack-icon.png')
     blackjackimage = pygame.image.load(blackjackimagepath)
     blackjackimage = pygame.transform.scale(blackjackimage, (200, 200))
@@ -188,7 +186,7 @@ def checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet):
     WIN.blit(PRINTTEXT, (50, 500))
     pygame.display.update()
     pygame.time.delay(2000)
-    return playerbalance, dealerbalance 
+    return playerbalance, dealerbalance, bet 
 
 def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerbalance, dealerbalance, bet):
     while dealertotal < 17:
@@ -198,15 +196,15 @@ def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerb
     
     
     dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
-    playerbalance, dealerbalance = checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet)
-    return playerbalance, dealerbalance
+    playerbalance, dealerbalance, bet = checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet)
+    return playerbalance, dealerbalance, bet
 
 
-#TODO: Make main menu
-##TODO: make dealer turn function
-#TODO: make balance and betting functions
-#TODO: Implement rules and save from main menu
-#TODO: Make game over/win function
+#TODO: Implement rules and load from main menu
+#TODO: Implement save from balance menu
+#TODO: Make game over/win function (in lines below gamestate = balance)
+#TODO: Implement double function while in-game
+
 def main():
     GAMESTATE = "start_menu"
     #initialize deck and players/dealer hands
@@ -245,80 +243,88 @@ def main():
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
 
-            elif GAMESTATE == "balance": 
-                   user_text = ''
-                   warning_text = ''
-                   inputbet = GAMEFONT.render(user_text, 1, BLACK)
-                   balance = GAMEFONT.render('Playerbalance: '+str(playerbalance)+'      Dealerbalance: '+str(dealerbalance), 1, BLACK)
-                   getbet = True
-                   while getbet == True:
-                       WIN.fill((110, 153, 70))
-                       for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                pygame.quit()
-                            if event.type == pygame.KEYDOWN:
-                                try:
-                                    if event.key == pygame.K_BACKSPACE:
-                                        user_text = user_text[:-1]
-                                        inputbet = GAMEFONT.render(user_text, 1, BLACK)
-                                    if event.key == pygame.K_RETURN:
-                                        bet = int(user_text)
-                                        if bet < 0:
-                                            warning_text = "Minimum bet is 1$."
-                                            warning_text = GAMEFONT.render(warning_text, 1, BLACK)
-                                            WIN.blit(warning_text, (50, 50))
-                                            WIN.blit(balance, (50,20))
-                                            pygame.display.update()
-                                            pygame.time.delay(2000)
-                                            user_text = ''
-                                        
-                                        
-                                        
-                                        elif bet > playerbalance:
-                                            warning_text = "Cannot bet more than available funds."
-                                            warning_text = GAMEFONT.render(warning_text, 1, BLACK)
-                                            WIN.blit(warning_text, (50, 50))
-                                            WIN.blit(balance, (50,20))
-                                            pygame.display.update()
-                                            pygame.time.delay(2000)
-                                            user_text = ''
-                                        
-                                        
-                                        elif bet > dealerbalance:
-                                            warning_text = "Cannot bet more than dealer's available funds."
-                                            warning_text = GAMEFONT.render(warning_text, 1, BLACK)
-                                            WIN.blit(warning_text, (50, 50))
-                                            WIN.blit(balance, (50,20))
-                                            pygame.display.update()
-                                            pygame.time.delay(2000)
-                                            user_text = ''
-                                        elif bet == 0:#NYI Save
-                                            pass
+            elif GAMESTATE == "balance":
+                    
+                    if playerbalance <= 0:
+                        running = False
+                        break
+                    elif dealerbalance <= 0:
+                        running = False
+                        break
+                    else:
+                       user_text = ''
+                       warning_text = ''
+                       inputbet = GAMEFONT.render(user_text, 1, BLACK)
+                       balance = GAMEFONT.render('Playerbalance: '+str(playerbalance)+'      Dealerbalance: '+str(dealerbalance), 1, BLACK)
+                       promptquestion = GAMEFONT.render ('How much do you want to bet? Write 0 to save and exit.', 1, BLACK)
+                       getbet = True
+                       while getbet == True:
+                           WIN.fill((110, 153, 70))
+                           for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    pygame.quit()
+                                if event.type == pygame.KEYDOWN:
+                                    try:
+                                        if event.key == pygame.K_BACKSPACE:
+                                            user_text = user_text[:-1]
+                                            inputbet = GAMEFONT.render(user_text, 1, BLACK)
+                                        if event.key == pygame.K_RETURN:
+                                            bet = int(user_text)
+                                            if bet < 0:
+                                                warning_text = "Minimum bet is 1$."
+                                                warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                                WIN.blit(warning_text, (50, 80))
+                                                WIN.blit(balance, (50,20))
+                                                WIN.blit(promptquestion, (50, 50))
+                                                pygame.display.update()
+                                                pygame.time.delay(2000)
+                                                user_text = ''
 
-                                        else:
-                                            GAMESTATE = "game"
-                                            getbet = False 
-                                except ValueError:
-                                    warning_text = "Invalid input! Please enter a valid number."
-                                    warning_text = GAMEFONT.render(warning_text, 1, BLACK)
-                                    WIN.blit(warning_text, (50, 50))
-                                    WIN.blit(balance, (50,20))
-                                    pygame.display.update()
-                                    pygame.time.delay(2000)
-                                    user_text = ''
+                                            elif bet > playerbalance:
+                                                warning_text = "Cannot bet more than available funds."
+                                                warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                                WIN.blit(warning_text, (50, 80))
+                                                WIN.blit(balance, (50,20))
+                                                WIN.blit(promptquestion, (50, 50))
+                                                pygame.display.update()
+                                                pygame.time.delay(2000)
+                                                user_text = ''
+
+                                            elif bet > dealerbalance:
+                                                warning_text = "Cannot bet more than dealer's available funds."
+                                                warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                                WIN.blit(warning_text, (50, 80))
+                                                WIN.blit(balance, (50,20))
+                                                WIN.blit(promptquestion, (50, 50))
+                                                pygame.display.update()
+                                                pygame.time.delay(2000)
+                                                user_text = ''
+                                            elif bet == 0:#NYI Save
+                                                pass
+
+                                            else:
+                                                GAMESTATE = "game"
+                                                getbet = False 
+                                    except ValueError:
+                                        warning_text = "Invalid input! Please enter a valid number."
+                                        warning_text = GAMEFONT.render(warning_text, 1, BLACK)
+                                        WIN.blit(warning_text, (50, 80))
+                                        WIN.blit(balance, (50,20))
+                                        WIN.blit(promptquestion, (50, 50))
+                                        pygame.display.update()
+                                        pygame.time.delay(2000)
+                                        user_text = ''
 
   
-                            if event.type == pygame.TEXTINPUT:
-                                user_text += event.text
-                                inputbet = GAMEFONT.render(user_text, 1, BLACK)
-                       inputbet = GAMEFONT.render(user_text, 1, BLACK)
-                       WIN.blit(inputbet, (100, 150))
-                       WIN.blit(balance, (50,20))
-                       pygame.display.update()
+                                if event.type == pygame.TEXTINPUT:
+                                    user_text += event.text
+                                    inputbet = GAMEFONT.render(user_text, 1, BLACK)
+                           inputbet = GAMEFONT.render(user_text, 1, BLACK)
+                           WIN.blit(inputbet, (50, 80))
+                           WIN.blit(balance, (50,20))
+                           WIN.blit(promptquestion, (50, 50))
+                           pygame.display.update()
                    
-
-                        
-
             elif GAMESTATE == "game":
 
                     WIN.fill((110, 153, 70))#Background green
@@ -327,41 +333,41 @@ def main():
 
                     if playertotal == 21 or dealertotal == 21:
                         playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show', playerbalance, dealerbalance, bet)
-                        checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet)
-                        running = False
+                        playerbalance, dealerbalance, bet = checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet)
+                        GAMESTATE = 'balance'
                         break
 
-                    #keys_pressed = pygame.key.get_pressed()
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_w:#hit
                             playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
                             playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'hide', playerbalance, dealerbalance, bet)
                             if playertotal > 21:
                                 playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show', playerbalance, dealerbalance, bet)
-                                checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet)
-                                running = False
+                                playerbalance, dealerbalance, bet = checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet)
+                                GAMESTATE = 'balance'
                                 break
                             elif playertotal == 21:
-                                dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerbalance, dealerbalance, bet)
-                                running = False
+                                playerbalance, dealerbalance, bet = dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerbalance, dealerbalance, bet)
+                                GAMESTATE = 'balance'
                                 break
                             else:
                                 continue
                     
                         if event.key == pygame.K_s:#stand
                             playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show', playerbalance, dealerbalance, bet)
-                            dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerbalance, dealerbalance, bet)
-                            running = False
+                            playerbalance, dealerbalance, bet = dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerbalance, dealerbalance, bet)
+                            GAMESTATE = 'balance'
                             break
                     
-                        if event.key == pygame.K_d:#double
+                        if event.key == pygame.K_d:#double NYI
                     
                             playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'hide', playerbalance, dealerbalance, bet)
+
                         if event.key == pygame.K_ESCAPE:
-                            running = False
+                            GAMESTATE = 'balance'
                             break
 
-    #GAMESTATE = "start_menu"
+
     main()
 
 if __name__ == "__main__":
