@@ -237,7 +237,7 @@ def main():
                         GAMESTATE = "balance"
                         
                     if event.key == pygame.K_e:#NYI(LOAD)
-                        ()
+                        GAMESTATE = "load"
                     if event.key == pygame.K_r:#Rules
                         GAMESTATE = rules.rules_render()
                         running = False
@@ -347,10 +347,72 @@ def main():
                     today = date.today()
                     filehand = open('saves.txt', 'a')
                     filehand.write("\n")
-                    filehand.write(str(index)+'_'+str(today)+"_"+ str(playerbalance) + " " + str(dealerbalance))
+                    filehand.write(str(index)+" "+str(today)+" "+ str(playerbalance) + " " + str(dealerbalance))
                     filehand.close()
                     running = False
                     break
+
+            elif GAMESTATE == "load":#NYI
+                    user_text = ''
+                    warning_text = ''
+                    inputloadindex = GAMEFONT.render(user_text, 1, BLACK)
+                    getloadindex = True
+                    while getloadindex == True:
+                        WIN.fill(BACKGROUNDGREEN)
+                        fhand = open('saves.txt', 'r')
+                        saves = fhand.read()
+                        fhand.close()
+                        saveline = saves.split('\n')
+                        indexline = []
+                        savename = []
+                        playertotlist = []
+                        dealertotlist = []
+                        prompt = GAMEFONT.render("Enter index number to load", 1, BLACK)
+                        WIN.blit(prompt, (50,50))
+
+                        index = 0
+                        x = 50
+                        y = 85
+                        for line in saveline:
+                            nameandtotals = line.split(' ')
+                            indexline.append(nameandtotals[0])
+                            savename.append(nameandtotals[1])
+                            playertotlist.append(int(nameandtotals[2]))
+                            dealertotlist.append(int(nameandtotals[3]))
+                            printsaveline = GAMEFONT.render(str(indexline[index])+"  "+str(savename[index])+"  " +str(playertotlist[index])+"  "+str(dealertotlist[index]), 1, BLACK)
+                            WIN.blit(printsaveline, (x,y))
+                            y+=25
+                            index = index + 1
+
+
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                            if event.type == pygame.KEYDOWN:
+                                try:
+                                    if event.key == pygame.K_BACKSPACE:
+                                        user_text = user_text[:-1]
+                                        inputloadindex = GAMEFONT.render(user_text, 1, BLACK)
+                                    if event.key == pygame.K_RETURN:
+                                        i = int(user_text)
+                                        playerbalance = int(playertotlist[i-1])
+                                        dealerbalance = int(dealertotlist[i-1])
+                                        GAMESTATE = "balance"
+                                        getloadindex = False 
+                                except:
+                                    warning_text = "Invalid input!"
+                                    warning_text = GAMEFONT.render(warning_text, 1, RED)
+                                    WIN.blit(warning_text, (50, y+25))
+                                    pygame.display.update()
+                                    pygame.time.delay(2000)
+                                    user_text = ''
+
+                            if event.type == pygame.TEXTINPUT:
+                                user_text += event.text
+                                inputloadindex = GAMEFONT.render(user_text, 1, BLACK)
+                        inputloadindex = GAMEFONT.render(user_text, 1, BLACK)
+                        WIN.blit(inputloadindex, (50, y+25))
+                        pygame.display.update()
                     
                    
             elif GAMESTATE == "game":
