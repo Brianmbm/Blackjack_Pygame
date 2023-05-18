@@ -18,7 +18,13 @@ WHITE = 255,255,255
 BLACK = 0,0,0
 BACKGROUNDGREEN = 110, 153, 70
 RED = 171,32,32
+YELLOW = 222, 206, 35
 
+#TODO: Refactor balance, load and save
+#TODO: Refactor variable names and functions
+#TODO: Low priority- add mouse function to click buttons instead of keys in menus (probably use of rect class and collisions)
+#FIXME: For unclear reason on certain places like in when showing game over screen, screen does not automatically update to start menu, need to press any key or move mouse for it to update
+#FIXME: If load function doesnt work, remove any extra line spaces in save.txt
 
 class Card:
     def __init__(self, cardName, cardValue, cardImage):
@@ -65,9 +71,9 @@ def dealcard(playerCards, dealerCards, deck, addtoHand):
             addtoHand.append(deck.deck[index])
             break
     return addtoHand
+
 def drawStartMenu():
     WIN.fill(BACKGROUNDGREEN)
-    #lucidafax rockwellextra bookmanoldstyle
     TITLEFONT = pygame.font.SysFont('rockwellextra', 100)
     MENUFONT = pygame.font.SysFont('rockwellextra', 40)
     title = TITLEFONT.render('Blackjack', 1, BLACK)
@@ -84,8 +90,8 @@ def drawStartMenu():
     blackjackimage = pygame.image.load(blackjackimagepath)
     blackjackimage = pygame.transform.scale(blackjackimage, (200, 200))
     WIN.blit(blackjackimage, (800, 50))
-
     pygame.display.update()
+
 #Function draws in-game cards/menu and calls calculatetotal function inside, returns card totals
 def drawCardsgetTotal(playerCards, dealerCards, state, playerbalance, dealerbalance, bet):
     WIN.fill(BACKGROUNDGREEN)
@@ -134,9 +140,6 @@ def drawCardsgetTotal(playerCards, dealerCards, state, playerbalance, dealerbala
         WIN.blit(balance, (50,20))
         pygame.display.update()
         return playertotal, dealertotal
-
-
-
 
 #Calculate value of all cards, called inside Drawcardsgettotal function
 def calculateTotal(dealerCards, playerCards):
@@ -202,27 +205,17 @@ def dealerTurn(playerCards, dealerCards, deck, playertotal, dealertotal, playerb
         dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
         playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'show', playerbalance, dealerbalance, bet)
         pygame.time.delay(1000)
-    
-    
     dealertotal, playertotal = calculateTotal(dealerCards, playerCards)
     playerbalance, dealerbalance, bet = checkWinner(playertotal, dealertotal, playerbalance, dealerbalance, bet)
     return playerbalance, dealerbalance, bet
 
-
-#TODO: Implement load from main menu
-#TODO: Implement save from balance menu
-#TODO: Make game over/win function (in lines below gamestate = balance)
-#TODO: Refactor balance menu
-#TODO: Refactor variable names and functions
-#TODO: Low priority- add mouse function to click buttons instead of keys in menus (probably use of rect class and collisions)
-
+#MAIN CODE: Runs from here (Called from if statement in last line)
 def main():
     GAMESTATE = "start_menu"
     playerbalance = 50
     dealerbalance = 100
     bet = 0
     clock = pygame.time.Clock()
-    
     running = True
     while running:
         clock.tick(FPS)#update window at 30 frames per second
@@ -236,7 +229,7 @@ def main():
                     if event.key == pygame.K_SPACE:#Start game
                         GAMESTATE = "balance"
                         
-                    if event.key == pygame.K_e:#NYI(LOAD)
+                    if event.key == pygame.K_e:#Load
                         GAMESTATE = "load"
                     if event.key == pygame.K_r:#Rules
                         GAMESTATE = rules.rules_render()
@@ -256,11 +249,21 @@ def main():
                     playerCards = dealcard(playerCards, dealerCards, deck, playerCards)
                     dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
                     dealerCards = dealcard(playerCards, dealerCards, deck, dealerCards)
-                    
+                    GAMEOVERFONT = pygame.font.SysFont('rockwellextra', 125)
                     if playerbalance <= 0:
+                        gameover = GAMEOVERFONT.render('GAME OVER', 1, RED)
+                        WIN.fill(BACKGROUNDGREEN)
+                        WIN.blit(gameover, (WIDTH//2 - gameover.get_width()/2, HEIGHT//2-gameover.get_height()/2))
+                        pygame.display.update()
+                        pygame.time.delay(2000)
                         running = False
                         break
                     elif dealerbalance <= 0:
+                        gameover = GAMEOVERFONT.render('$$YOU WIN!$$', 1, YELLOW)
+                        WIN.fill(BACKGROUNDGREEN)
+                        WIN.blit(gameover, (WIDTH/2 - gameover.get_width()/2, HEIGHT//2-gameover.get_height()/2))
+                        pygame.display.update()
+                        pygame.time.delay(2000)
                         running = False
                         break
                     else:
@@ -311,7 +314,7 @@ def main():
                                                 pygame.display.update()
                                                 pygame.time.delay(2000)
                                                 user_text = ''
-                                            elif bet == 0:#NYI Save
+                                            elif bet == 0:
                                                 GAMESTATE = "save"
                                                 getbet = False 
 
@@ -336,6 +339,7 @@ def main():
                            WIN.blit(balance, (50,20))
                            WIN.blit(promptquestion, (50, 50))
                            pygame.display.update()
+
             elif GAMESTATE == "save":
                     fhand = open('saves.txt', 'r')
                     saves = fhand.read()
@@ -352,7 +356,7 @@ def main():
                     running = False
                     break
 
-            elif GAMESTATE == "load":#NYI
+            elif GAMESTATE == "load":
                     user_text = ''
                     warning_text = ''
                     inputloadindex = GAMEFONT.render(user_text, 1, BLACK)
@@ -384,7 +388,6 @@ def main():
                             y+=25
                             index = index + 1
 
-
                         for event in pygame.event.get():
                             if event.type == pygame.QUIT:
                                 pygame.quit()
@@ -413,8 +416,7 @@ def main():
                         inputloadindex = GAMEFONT.render(user_text, 1, BLACK)
                         WIN.blit(inputloadindex, (50, y+25))
                         pygame.display.update()
-                    
-                   
+                                    
             elif GAMESTATE == "game":
                     WIN.fill(BACKGROUNDGREEN)
                     playertotal, dealertotal = drawCardsgetTotal(playerCards, dealerCards, 'hide',  playerbalance, dealerbalance, bet)
@@ -474,7 +476,7 @@ def main():
                                     GAMESTATE = 'balance'
                                     break
 
-                        if event.key == pygame.K_ESCAPE:
+                        if event.key == pygame.K_q:
                             running = False
                             break
 
